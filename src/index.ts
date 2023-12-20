@@ -1,4 +1,5 @@
 import { getInput, setOutput, setFailed, summary } from "@actions/core";
+import { which } from "@actions/io";
 import type { Project, Deployment } from "@cloudflare/types";
 import { context, getOctokit } from "@actions/github";
 import path from "node:path";
@@ -44,8 +45,13 @@ try {
 			CLOUDFLARE_API_TOKEN: apiToken,
 			CLOUDFLARE_ACCOUNT_ID: accountId,
 		};
-		const branchString = branch ? `--branch="${branch}"` : "";
-		await $`pnpm dlx wrangler@${wranglerVersion} pages publish "${directory}" --project-name="${projectName}" ${branchString}`;
+		const pnpm = await which("pnpm", true);
+		const optionalArgs: string[] = [];
+		if (branch) {
+			optionalArgs.push(`--branch="${branch}"`);
+		}
+		// prettier-ignore
+		await $`${pnpm} dlx wrangler@${wranglerVersion} pages publish "${directory}" --project-name="${projectName}" ${optionalArgs.join(" ")}}`;
 		const response = await fetch(
 			`https://api.cloudflare.com/client/v4/accounts/${accountId}/pages/projects/${projectName}/deployments`,
 			{ headers: { Authorization: `Bearer ${apiToken}` } }

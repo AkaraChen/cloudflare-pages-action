@@ -1,4 +1,4 @@
-on: [push]
+on: [push, workflow_dispatch]
 
 jobs:
   example:
@@ -14,7 +14,7 @@ jobs:
         uses: ./
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: 468cce80dfb431f3a4058e6dc6031a44
+          accountId: 271fd9019f80591966fd81b07f620646
           projectName: github-actions-example
           directory: example
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
