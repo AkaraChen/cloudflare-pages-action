@@ -39232,10 +39232,10 @@ try {
   };
   const createPagesDeployment = async () => {
     $.cwd = import_node_path3.default.join(process.cwd(), workingDirectory);
-    await $`export CLOUDFLARE_API_TOKEN="${apiToken}"`;
-    if (accountId) {
-      await $`export CLOUDFLARE_ACCOUNT_ID="${accountId}"`;
-    }
+    $.env = {
+      CLOUDFLARE_API_TOKEN: apiToken,
+      CLOUDFLARE_ACCOUNT_ID: accountId
+    };
     const branchString = branch ? `--branch="${branch}"` : "";
     await $`pnpm dlx wrangler@${wranglerVersion} pages publish "${directory}" --project-name="${projectName}" ${branchString}`;
     const response = await fetch(
