@@ -39236,7 +39236,8 @@ try {
     if (accountId) {
       await $`export CLOUDFLARE_ACCOUNT_ID="${accountId}"`;
     }
-    await $`pnpm dlx wrangler@${wranglerVersion} pages publish "${directory}" --project-name="${projectName}" --branch="${branch}`;
+    const branchString = branch ? `--branch="${branch}"` : "";
+    await $`pnpm dlx wrangler@${wranglerVersion} pages publish "${directory}" --project-name="${projectName}" ${branchString}`;
     const response = await fetch(
       `https://api.cloudflare.com/client/v4/accounts/${accountId}/pages/projects/${projectName}/deployments`,
       { headers: { Authorization: `Bearer ${apiToken}` } }
