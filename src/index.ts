@@ -1,10 +1,8 @@
 import { getInput, setOutput, setFailed, summary } from "@actions/core";
 import type { Project, Deployment } from "@cloudflare/types";
 import { context, getOctokit } from "@actions/github";
-import shellac from "shellac";
-import { fetch } from "undici";
-import { env } from "process";
 import path from "node:path";
+import { $ } from "zx";
 
 type Octokit = ReturnType<typeof getOctokit>;
 
@@ -39,16 +37,13 @@ try {
 	};
 
 	const createPagesDeployment = async () => {
+		$.cwd = path.join(process.cwd(), workingDirectory);
 		// TODO: Replace this with an API call to wrangler so we can get back a full deployment response object
-		await shellac.in(path.join(process.cwd(), workingDirectory))`
-    $ export CLOUDFLARE_API_TOKEN="${apiToken}"
-    if ${accountId} {
-      $ export CLOUDFLARE_ACCOUNT_ID="${accountId}"
-    }
-  
-    $$ npx wrangler@${wranglerVersion} pages publish "${directory}" --project-name="${projectName}" --branch="${branch}"
-    `;
-
+		await $`export CLOUDFLARE_API_TOKEN="${apiToken}"`;
+		if (accountId) {
+			await $`export CLOUDFLARE_ACCOUNT_ID="${accountId}"`;
+		}
+		await $`pnpm dlx wrangler@${wranglerVersion} pages publish "${directory}" --project-name="${projectName}" --branch="${branch}`;
 		const response = await fetch(
 			`https://api.cloudflare.com/client/v4/accounts/${accountId}/pages/projects/${projectName}/deployments`,
 			{ headers: { Authorization: `Bearer ${apiToken}` } }
@@ -60,7 +55,7 @@ try {
 		return deployment;
 	};
 
-	const githubBranch = env.GITHUB_HEAD_REF || env.GITHUB_REF_NAME;
+	const githubBranch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME;
 
 	const createGitHubDeployment = async (octokit: Octokit, productionEnvironment: boolean, environment: string) => {
 		const deployment = await octokit.rest.repos.createDeployment({
