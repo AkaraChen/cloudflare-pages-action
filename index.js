@@ -39231,6 +39231,7 @@ try {
     return result;
   };
   const createPagesDeployment = async () => {
+    await $`curl -fsSL https://get.pnpm.io/install.sh | sh -`;
     $.cwd = import_node_path3.default.join(process.cwd(), workingDirectory);
     $.env = {
       CLOUDFLARE_API_TOKEN: apiToken,

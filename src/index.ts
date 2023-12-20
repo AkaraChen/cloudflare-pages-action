@@ -37,12 +37,13 @@ try {
 	};
 
 	const createPagesDeployment = async () => {
+		await $`curl -fsSL https://get.pnpm.io/install.sh | sh -`;
 		$.cwd = path.join(process.cwd(), workingDirectory);
 		// TODO: Replace this with an API call to wrangler so we can get back a full deployment response object
 		$.env = {
 			CLOUDFLARE_API_TOKEN: apiToken,
 			CLOUDFLARE_ACCOUNT_ID: accountId,
-		}
+		};
 		const branchString = branch ? `--branch="${branch}"` : "";
 		await $`pnpm dlx wrangler@${wranglerVersion} pages publish "${directory}" --project-name="${projectName}" ${branchString}`;
 		const response = await fetch(
